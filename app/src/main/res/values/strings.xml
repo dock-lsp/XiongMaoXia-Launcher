@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 应用名称 -->
+    <string name="app_name">熊猫侠</string>
+    
+    <!-- 状态栏 -->
+    <string name="status_bar_time_format">HH:mm</string>
+    <string name="status_bar_date_format">MM月dd日 EEEE</string>
+    
+    <!-- 底部导航 -->
+    <string name="nav_home">主页</string>
+    <string name="nav_navigation">导航</string>
+    <string name="nav_music">音乐</string>
+    <string name="nav_car">车辆</string>
+    <string name="nav_settings">设置</string>
+    <string name="nav_volume">音量</string>
+    <string name="nav_add">添加</string>
+    
+    <!-- 地图卡片 -->
+    <string name="map_card_title">高德地图</string>
+    <string name="map_card_slogan">连接真实世界</string>
+    <string name="map_card_subtitle">让出行更美好</string>
+    <string name="map_card_open">打开地图</string>
+    
+    <!-- 音乐卡片 -->
+    <string name="music_card_title">酷我音乐</string>
+    <string name="music_no_playing">暂无播放</string>
+    <string name="music_unknown_artist">未知歌手</string>
+    
+    <!-- 应用名称 -->
+    <string name="app_my_apps">我的应用</string>
+    <string name="app_settings">系统设置</string>
+    <string name="app_theme">主题中心</string>
+    <string name="app_music">酷我音乐</string>
+    <string name="app_store">应用商店</string>
+    <string name="app_car_service">车主服务</string>
+    <string name="app_file_manager">文件管理</string>
+    <string name="app_more">更多</string>
+    
+    <!-- 自定义应用 -->
+    <string name="custom_app_add_title">添加应用</string>
+    <string name="custom_app_max_reached">最多只能添加5个自定义应用</string>
+    <string name="custom_app_delete_hint">长按删除</string>
+    <string name="custom_app_delete_confirm">确定删除此应用吗？</string>
+    
+    <!-- 音量调节 -->
+    <string name="volume_title">音量调节</string>
+    <string name="volume_media">媒体音量</string>
+    <string name="volume_ring">铃声音量</string>
+    <string name="volume_alarm">闹钟音量</string>
+    
+    <!-- 通用 -->
+    <string name="loading">加载中...</string>
+    <string name="no_data">暂无数据</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="delete">删除</string>
+
+    <!-- 悬浮音乐 -->
+    <string name="floating_music_title">悬浮音乐</string>
+    <string name="floating_music_summary">显示悬浮音乐播放卡片</string>
+    <string name="floating_music_no_permission">请先授予悬浮窗权限</string>
+    <string name="floating_music_started">悬浮音乐已启动</string>
+    <string name="floating_music_stopped">悬浮音乐已关闭</string>
+
+    <!-- 悬浮导航 -->
+    <string name="floating_map_quick_home">回家</string>
+    <string name="floating_map_quick_company">去公司</string>
+    <string name="floating_map_quick_gas">加油站</string>
+    <string name="floating_map_quick_parking">停车场</string>
+</resources>

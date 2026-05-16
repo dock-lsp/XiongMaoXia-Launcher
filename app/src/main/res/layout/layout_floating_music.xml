@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="320dp"
+    android:layout_height="180dp"
+    android:background="#CC1A1A2E"
+    android:elevation="8dp">
+
+    <!-- 背景模糊层（模拟毛玻璃效果） -->
+    <ImageView
+        android:id="@+id/music_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:alpha="0.3" />
+
+    <!-- 渐变遮罩 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_music_gradient" />
+
+    <!-- 标题栏 -->
+    <LinearLayout
+        android:id="@+id/music_title_bar"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp">
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_music"
+            android:tint="#00CED1" />
+
+        <TextView
+            android:id="@+id/music_tv_song"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="西海情歌"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever" />
+
+        <TextView
+            android:id="@+id/music_tv_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:text="刀郎"
+            android:textColor="#80FFFFFF"
+            android:textSize="12sp"
+            android:singleLine="true" />
+
+        <ImageView
+            android:id="@+id/music_btn_close"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_close"
+            android:padding="6dp"
+            android:tint="#FFFFFF"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+    </LinearLayout>
+
+    <!-- 歌词区域 -->
+    <ScrollView
+        android:id="@+id/music_lyrics_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="36dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="自你离开以后"
+                android:textColor="#40FFFFFF"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp" />
+
+            <TextView
+                android:id="@+id/music_tv_lyric_current"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="听寒风呼啸依旧"
+                android:textColor="#00CED1"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="一眼望不到边"
+                android:textColor="#40FFFFFF"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="风似刀割我的脸"
+                android:textColor="#30FFFFFF"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- 播放控制栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="#40000000"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <ImageView
+            android:id="@+id/music_btn_lyric"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_lyric"
+            android:tint="#80FFFFFF"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/music_btn_prev"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_previous"
+            android:tint="#FFFFFF"
+            android:padding="4dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+        <ImageView
+            android:id="@+id/music_btn_play"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/ic_pause"
+            android:tint="#FFFFFF"
+            android:padding="8dp"
+            android:background="@drawable/bg_play_button" />
+
+        <ImageView
+            android:id="@+id/music_btn_next"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_next"
+            android:tint="#FFFFFF"
+            android:padding="4dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/music_btn_open_app"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_open_in_new"
+            android:tint="#80FFFFFF"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+    </LinearLayout>
+
+</FrameLayout>
