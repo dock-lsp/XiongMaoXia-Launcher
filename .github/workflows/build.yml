@@ -1,4 +1,4 @@
-name: Android Build
+name: Android Build and Release
 
 on:
   push:
@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
     - name: Checkout code
@@ -23,11 +25,18 @@ jobs:
         
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      
+
+    - name: Get version from build.gradle
+      id: get_version
+      run: |
+        VERSION=$(grep -o 'versionName "[^"]*"' app/build.gradle | head -1 | sed 's/versionName "//;s/"//')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "App Version: $VERSION"
+        
     - name: Build Debug APK
       run: ./gradlew assembleDebug
       
-    - name: Upload APK
+    - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
         name: XiongMaoXia-Debug
@@ -43,3 +52,31 @@ jobs:
         name: XiongMaoXia-Release
         path: app/build/outputs/apk/release/*.apk
       continue-on-error: true
+
+    - name: Create Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.get_version.outputs.version }}
+        name: 熊猫侠 v${{ steps.get_version.outputs.version }}
+        body: |
+          ## 熊猫侠车机桌面 v${{ steps.get_version.outputs.version }}
+          
+          ### 更新内容
+          - 自动构建发布
+          
+          ### 下载
+          - Debug 版本：用于开发和测试
+          - Release 版本：正式使用（如可用）
+          
+          ### 安装说明
+          1. 下载对应版本的 APK
+          2. 在 Android 车机设备上安装
+          3. 设置为默认桌面启动器
+        files: |
+          app/build/outputs/apk/debug/*.apk
+          app/build/outputs/apk/release/*.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
