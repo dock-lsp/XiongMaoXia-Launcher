@@ -56,6 +56,11 @@ class FloatingBallService : Service() {
         super.onCreate()
         prefs = getSharedPreferences(PREF_FLOAT_BALL, Context.MODE_PRIVATE)
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        // 检查悬浮窗权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            stopSelf()
+            return
+        }
         createFloatingBall()
         createMenu()
     }

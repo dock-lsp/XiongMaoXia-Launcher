@@ -1,8 +1,8 @@
 package com.pandora.carlauncher
 
-import android.app.Application
+import androidx.multidex.MultiDexApplication
 
-class PandaApplication : Application() {
+class PandaApplication : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         CrashHandler.instance.init(this)
