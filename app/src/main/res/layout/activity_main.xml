@@ -1,123 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#121212"
-    android:gravity="center_horizontal">
+    android:fitsSystemWindows="false">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="🐼 熊猫侠车载启动器"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="32dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="悬浮窗插件系统"
-        android:textColor="#90EE90"
-        android:textSize="18sp"
-        android:layout_marginBottom="24dp"/>
-
-    <!-- 音乐悬浮窗按钮 -->
-    <Button
-        android:id="@+id/btn_music_float"
+    <!-- 壁纸层 -->
+    <ImageView
+        android:id="@+id/iv_wallpaper"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="🎵 音乐悬浮窗"
-        android:backgroundTint="#E91E63"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:layout_marginBottom="12dp"/>
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
 
-    <!-- 地图悬浮窗按钮 -->
-    <Button
-        android:id="@+id/btn_map_float"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="🗺️ 地图悬浮窗"
-        android:backgroundTint="#FF9800"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:layout_marginBottom="12dp"/>
-
-    <!-- 天气悬浮窗按钮 -->
-    <Button
-        android:id="@+id/btn_weather_float"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="🌤️ 天气悬浮窗"
-        android:backgroundTint="#2196F3"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:layout_marginBottom="24dp"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#33FFFFFF"
-        android:layout_marginBottom="24dp"/>
-
-    <!-- 批量操作按钮 -->
+    <!-- 主内容层 -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@android:color/transparent">
 
-        <Button
-            android:id="@+id/btn_show_all"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:text="显示全部"
-            android:backgroundTint="#4CAF50"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:layout_marginEnd="8dp"/>
+    <!-- 顶部状态栏 -->
+    <include
+        android:id="@+id/status_bar"
+        layout="@layout/layout_status_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/status_bar_height" />
 
-        <Button
-            android:id="@+id/btn_hide_all"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
+    <!-- 主内容区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/card_margin"
+        android:paddingEnd="@dimen/card_margin"
+        android:paddingTop="@dimen/spacing_sm"
+        android:paddingBottom="@dimen/spacing_sm">
+
+        <!-- 竖屏：地图 + 音乐 上下布局 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:orientation="vertical">
+
+            <!-- 地图卡片 -->
+            <include
+                android:id="@+id/card_map"
+                layout="@layout/layout_card_map"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="@dimen/spacing_sm" />
+
+            <!-- 音乐卡片 -->
+            <include
+                android:id="@+id/card_music"
+                layout="@layout/layout_card_music"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="@dimen/spacing_sm" />
+
+        </LinearLayout>
+
+        <!-- 应用网格区域 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_app_grid"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="隐藏全部"
-            android:backgroundTint="#F44336"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginTop="@dimen/spacing_sm" />
 
     </LinearLayout>
 
-    <View
+    <!-- 底部导航栏 -->
+    <include
+        android:id="@+id/bottom_nav"
+        layout="@layout/layout_bottom_nav"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#33FFFFFF"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="24dp"/>
+        android:layout_height="@dimen/bottom_nav_height" />
 
-    <!-- 权限设置按钮 -->
-    <Button
-        android:id="@+id/btn_permission"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="⚙️ 悬浮窗权限设置"
-        android:backgroundTint="#607D8B"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"/>
+    </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="提示：首次使用需要开启悬浮窗权限"
-        android:textColor="#999999"
-        android:textSize="12sp"
-        android:layout_marginTop="16dp"/>
-
-</LinearLayout>
+</FrameLayout>

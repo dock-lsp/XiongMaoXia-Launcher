@@ -33,6 +33,12 @@ class SettingsActivity : AppCompatActivity() {
         // 悬浮音乐开关
         setupFloatingMusicSwitch()
 
+        // 悬浮地图开关
+        setupFloatingMapSwitch()
+
+        // 悬浮天气开关
+        setupFloatingWeatherSwitch()
+
         // 设置列表项点击事件
         setupSettingItems()
     }
@@ -144,6 +150,86 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 stopService(Intent(this, FloatingMusicService::class.java))
                 Toast.makeText(this, R.string.floating_music_stopped, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    /**
+     * 设置悬浮地图开关
+     */
+    private fun setupFloatingMapSwitch() {
+        val switchFloatingMap = findViewById<Switch>(R.id.switch_floating_map)
+        val prefs = getSharedPreferences("panda_floating_map", MODE_PRIVATE)
+        switchFloatingMap?.isChecked = prefs.getBoolean("enabled", false)
+
+        switchFloatingMap?.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit().putBoolean("enabled", isChecked).apply()
+
+            if (isChecked) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                    val intent = Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        android.net.Uri.parse("package:$packageName")
+                    )
+                    startActivity(intent)
+                    Toast.makeText(this, "请授予悬浮窗权限", Toast.LENGTH_LONG).show()
+                    switchFloatingMap.isChecked = false
+                    return@setOnCheckedChangeListener
+                }
+                val intent = Intent(this, com.pandora.floating.FloatingForegroundService::class.java)
+                intent.putExtra("type", "map")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(intent)
+                } else {
+                    startService(intent)
+                }
+                Toast.makeText(this, "悬浮地图已开启", Toast.LENGTH_SHORT).show()
+            } else {
+                val intent = Intent(this, com.pandora.floating.FloatingForegroundService::class.java)
+                intent.putExtra("type", "map")
+                intent.putExtra("stop", true)
+                startService(intent)
+                Toast.makeText(this, "悬浮地图已关闭", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    /**
+     * 设置悬浮天气开关
+     */
+    private fun setupFloatingWeatherSwitch() {
+        val switchFloatingWeather = findViewById<Switch>(R.id.switch_floating_weather)
+        val prefs = getSharedPreferences("panda_floating_weather", MODE_PRIVATE)
+        switchFloatingWeather?.isChecked = prefs.getBoolean("enabled", false)
+
+        switchFloatingWeather?.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit().putBoolean("enabled", isChecked).apply()
+
+            if (isChecked) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                    val intent = Intent(
+                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        android.net.Uri.parse("package:$packageName")
+                    )
+                    startActivity(intent)
+                    Toast.makeText(this, "请授予悬浮窗权限", Toast.LENGTH_LONG).show()
+                    switchFloatingWeather.isChecked = false
+                    return@setOnCheckedChangeListener
+                }
+                val intent = Intent(this, com.pandora.floating.FloatingForegroundService::class.java)
+                intent.putExtra("type", "weather")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(intent)
+                } else {
+                    startService(intent)
+                }
+                Toast.makeText(this, "悬浮天气已开启", Toast.LENGTH_SHORT).show()
+            } else {
+                val intent = Intent(this, com.pandora.floating.FloatingForegroundService::class.java)
+                intent.putExtra("type", "weather")
+                intent.putExtra("stop", true)
+                startService(intent)
+                Toast.makeText(this, "悬浮天气已关闭", Toast.LENGTH_SHORT).show()
             }
         }
     }
