@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
+import android.hardware.display.DisplayManager
+import android.media.ImageReader
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
