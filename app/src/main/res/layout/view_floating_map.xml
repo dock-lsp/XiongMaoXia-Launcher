@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#CC1A1A1A"
+    android:radius="12dp">
+
+    <TextView
+        android:id="@+id/tv_navi_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="正在导航"
+        android:textColor="#4CAF50"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:gravity="center"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#33FFFFFF"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/tv_distance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="剩余 12.5 公里"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/tv_next_turn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="前方 500 米右转"
+        android:textColor="#FF9800"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:id="@+id/tv_service_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="下一服务区：25 公里"
+        android:textColor="#90EE90"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:layout_marginTop="8dp"/>
+
+</LinearLayout>
