@@ -72,7 +72,8 @@ public class MusicFloatingView extends DraggableFloatingView {
     private void togglePlayPause() {
         isPlaying = !isPlaying;
         updatePlayButton();
-        // TODO: 发送媒体按钮广播或调用MediaController
+        // 发送媒体按钮广播
+        sendMediaButtonKeyEvent(android.view.KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
     }
 
     /**
@@ -90,14 +91,35 @@ public class MusicFloatingView extends DraggableFloatingView {
      * 上一曲
      */
     private void playPrev() {
-        // TODO: 发送上一曲控制
+        // 发送上一曲控制
+        sendMediaButtonKeyEvent(android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS);
     }
 
     /**
      * 下一曲
      */
     private void playNext() {
-        // TODO: 发送下一曲控制
+        // 发送下一曲控制
+        sendMediaButtonKeyEvent(android.view.KeyEvent.KEYCODE_MEDIA_NEXT);
+    }
+
+    /**
+     * 发送媒体按钮按键事件
+     */
+    private void sendMediaButtonKeyEvent(int keyCode) {
+        // 发送按键按下事件
+        android.view.KeyEvent keyDown = new android.view.KeyEvent(
+            android.view.KeyEvent.ACTION_DOWN, keyCode);
+        android.content.Intent intentDown = new android.content.Intent(android.content.Intent.ACTION_MEDIA_BUTTON);
+        intentDown.putExtra(android.content.Intent.EXTRA_KEY_EVENT, keyDown);
+        getContext().sendBroadcast(intentDown);
+
+        // 发送按键释放事件
+        android.view.KeyEvent keyUp = new android.view.KeyEvent(
+            android.view.KeyEvent.ACTION_UP, keyCode);
+        android.content.Intent intentUp = new android.content.Intent(android.content.Intent.ACTION_MEDIA_BUTTON);
+        intentUp.putExtra(android.content.Intent.EXTRA_KEY_EVENT, keyUp);
+        getContext().sendBroadcast(intentUp);
     }
 
     private int dpToPx(int dp) {

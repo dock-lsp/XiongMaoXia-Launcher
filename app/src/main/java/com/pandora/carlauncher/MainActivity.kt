@@ -194,7 +194,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, SettingsActivity::class.java))
             })
             apps.add(GridApp(appName = "主题中心", iconRes = R.drawable.ic_music, iconBg = R.drawable.bg_icon_cyan) {
-                Toast.makeText(this, "主题中心开发中", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, WallpaperActivity::class.java))
             })
 
             // 动态检测音乐应用
