@@ -81,9 +81,9 @@ public class MusicFloatingView extends DraggableFloatingView {
      */
     private void updatePlayButton() {
         if (isPlaying) {
-            btnPlayPause.setImageResource(R.drawable.ic_music_pause);
+            btnPlayPause.setImageResource(R.drawable.ic_pause);
         } else {
-            btnPlayPause.setImageResource(R.drawable.ic_music_play);
+            btnPlayPause.setImageResource(R.drawable.ic_play);
         }
     }
 
