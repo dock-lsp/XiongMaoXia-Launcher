@@ -2,12 +2,9 @@ package com.xmxcar.launcher
 
 import android.app.AlertDialog
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.drawable.Drawable
-import android.media.AudioManager
 import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
@@ -17,7 +14,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.view.animation.LinearInterpolator
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -63,6 +59,9 @@ class MusicPlayerActivity : AppCompatActivity() {
     private var lyricsList = mutableListOf<LyricLine>()
     private var currentLyricIndex = -1
 
+    // 媒体状态广播接收器
+    private var mediaReceiver: BroadcastReceiver? = null
+
     data class LyricLine(
         val time: Long,
         val text: String
@@ -76,6 +75,7 @@ class MusicPlayerActivity : AppCompatActivity() {
         setupListeners()
         scanMusicApps()
         connectToMediaSession()
+        registerMediaReceiver()
     }
 
     private fun initViews() {
@@ -95,7 +95,7 @@ class MusicPlayerActivity : AppCompatActivity() {
         tvNoLyrics = findViewById(R.id.tv_no_lyrics)
 
         // 返回按钮
-        findViewById<ImageButton>(R.id.btn_back).setOnClickListener { finish() }
+        findViewById<ImageButton>(R.id.btn_back)?.setOnClickListener { finish() }
     }
 
     private fun setupListeners() {
@@ -157,7 +157,7 @@ class MusicPlayerActivity : AppCompatActivity() {
      */
     private fun updateMusicAppInfo() {
         currentMusicApp?.let { app ->
-            findViewById<TextView>(R.id.tv_current_app).text = app.appName
+            findViewById<TextView>(R.id.tv_current_app)?.text = app.appName
             app.icon?.let { ivAlbumArt.setImageDrawable(it) }
         }
     }
@@ -183,20 +183,82 @@ class MusicPlayerActivity : AppCompatActivity() {
     }
 
     /**
-     * 连接到媒体会话
+     * 连接到媒体会话（安全方式，不依赖 NotificationListenerService）
      */
     private fun connectToMediaSession() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val sessionManager = getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
-            val controllers = sessionManager.getActiveSessions(ComponentName(this, NotificationListener::class.java))
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                val sessionManager = getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
 
-            if (controllers.isNotEmpty()) {
-                mediaController = controllers.first()
-                mediaController?.registerCallback(mediaCallback)
-                updatePlaybackState(mediaController?.playbackState)
-                updateMetadata(mediaController?.metadata)
+                try {
+                    val activeSessions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                        sessionManager.getActiveSessions(null)
+                    } else {
+                        emptyList()
+                    }
+
+                    if (activeSessions.isNotEmpty()) {
+                        val playingSession = activeSessions.find { controller ->
+                            controller.playbackState?.state == PlaybackState.STATE_PLAYING
+                        } ?: activeSessions.first()
+
+                        mediaController = MediaController(this, playingSession.sessionToken)
+                        mediaController?.registerCallback(mediaCallback)
+                        updatePlaybackState(mediaController?.playbackState)
+                        updateMetadata(mediaController?.metadata)
+                    }
+                } catch (e: SecurityException) {
+                    android.util.Log.w(TAG, "无法获取媒体会话，使用广播监听: ${e.message}")
+                } catch (e: Exception) {
+                    android.util.Log.w(TAG, "连接媒体会话失败: ${e.message}")
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "connectToMediaSession 异常: ${e.message}")
+        }
+    }
+
+    /**
+     * 注册媒体状态广播接收器
+     */
+    private fun registerMediaReceiver() {
+        mediaReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                when (intent?.action) {
+                    "com.android.music.playstatechanged",
+                    "com.android.music.metachanged",
+                    "net.sourceforge.subsonic.api.playstatechanged" -> {
+                        // 更新播放状态
+                        val isPlayingState = intent.getBooleanExtra("playing", false)
+                        isPlaying = isPlayingState
+                        updatePlayButton()
+
+                        val track = intent.getStringExtra("track")
+                        val artist = intent.getStringExtra("artist")
+                        val album = intent.getStringExtra("album")
+                        if (track != null) {
+                            tvSongTitle.text = track
+                        }
+                        if (artist != null) {
+                            tvArtist.text = artist
+                        }
+                        if (album != null) {
+                            tvAlbum.text = album
+                        }
+                        if (track != null && artist != null) {
+                            loadMockLyrics(track, artist)
+                        }
+                    }
+                }
             }
         }
+
+        val filter = IntentFilter().apply {
+            addAction("com.android.music.playstatechanged")
+            addAction("com.android.music.metachanged")
+            addAction("net.sourceforge.subsonic.api.playstatechanged")
+        }
+        registerReceiver(mediaReceiver, filter)
     }
 
     private val mediaCallback = object : MediaController.Callback() {
@@ -217,14 +279,12 @@ class MusicPlayerActivity : AppCompatActivity() {
             isPlaying = it.state == PlaybackState.STATE_PLAYING
             updatePlayButton()
 
-            // 更新进度
             val position = it.position
             val bufferedPosition = it.bufferedPosition
             seekBarProgress.progress = position.toInt()
             seekBarProgress.secondaryProgress = bufferedPosition.toInt()
             tvCurrentTime.text = formatTime(position)
 
-            // 更新歌词高亮
             updateLyricsHighlight(position)
         }
     }
@@ -245,13 +305,11 @@ class MusicPlayerActivity : AppCompatActivity() {
             tvTotalTime.text = formatTime(duration)
             seekBarProgress.max = duration.toInt()
 
-            // 尝试加载专辑封面
             val art = it.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
             if (art != null) {
                 ivAlbumArt.setImageBitmap(art)
             }
 
-            // 模拟加载歌词（实际应从音乐应用或网络获取）
             loadMockLyrics(title, artist)
         }
     }
@@ -260,8 +318,6 @@ class MusicPlayerActivity : AppCompatActivity() {
      * 加载模拟歌词
      */
     private fun loadMockLyrics(title: String, artist: String) {
-        // 这里应该根据歌曲信息从音乐应用或网络获取真实歌词
-        // 目前使用模拟数据演示功能
         lyricsList.clear()
         val mockLyrics = listOf(
             LyricLine(0, "$title - $artist"),
@@ -310,7 +366,6 @@ class MusicPlayerActivity : AppCompatActivity() {
         if (newIndex != currentLyricIndex && newIndex >= 0) {
             currentLyricIndex = newIndex
 
-            // 更新高亮
             for (i in 0 until layoutLyrics.childCount) {
                 val tv = layoutLyrics.getChildAt(i) as TextView
                 if (i == newIndex) {
@@ -318,7 +373,6 @@ class MusicPlayerActivity : AppCompatActivity() {
                     tv.textSize = 18f
                     tv.animate().scaleX(1.1f).scaleY(1.1f).setDuration(200).start()
 
-                    // 滚动到中间
                     scrollViewLyrics.post {
                         val scrollY = tv.top - scrollViewLyrics.height / 2 + tv.height / 2
                         scrollViewLyrics.smoothScrollTo(0, scrollY.coerceAtLeast(0))
@@ -343,7 +397,9 @@ class MusicPlayerActivity : AppCompatActivity() {
                 controller.transportControls.play()
             }
         } ?: run {
-            // 如果没有媒体控制器，尝试启动音乐应用
+            // 如果没有媒体控制器，发送媒体按键广播
+            sendMediaBroadcast(if (isPlaying) "pause" else "play")
+            // 同时尝试启动音乐应用
             launchMusicApp()
         }
     }
@@ -353,7 +409,7 @@ class MusicPlayerActivity : AppCompatActivity() {
      */
     private fun playPrevious() {
         mediaController?.transportControls?.skipToPrevious()
-            ?: Toast.makeText(this, "请先启动音乐应用", Toast.LENGTH_SHORT).show()
+            ?: sendMediaBroadcast("previous")
     }
 
     /**
@@ -361,7 +417,20 @@ class MusicPlayerActivity : AppCompatActivity() {
      */
     private fun playNext() {
         mediaController?.transportControls?.skipToNext()
-            ?: Toast.makeText(this, "请先启动音乐应用", Toast.LENGTH_SHORT).show()
+            ?: sendMediaBroadcast("next")
+    }
+
+    /**
+     * 发送媒体控制广播
+     */
+    private fun sendMediaBroadcast(action: String) {
+        try {
+            val intent = Intent("com.android.music.musicservicecommand")
+            intent.putExtra("command", action)
+            sendBroadcast(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "请先启动音乐应用", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /**
@@ -388,14 +457,37 @@ class MusicPlayerActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        connectToMediaSession()
+        try {
+            connectToMediaSession()
+        } catch (e: Exception) {
+            android.util.Log.w(TAG, "onResume 连接媒体会话失败: ${e.message}")
+        }
         startProgressUpdate()
     }
 
     override fun onPause() {
         super.onPause()
         stopProgressUpdate()
-        mediaController?.unregisterCallback(mediaCallback)
+        try {
+            mediaController?.unregisterCallback(mediaCallback)
+        } catch (e: Exception) {
+            // ignore
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopProgressUpdate()
+        try {
+            mediaReceiver?.let { unregisterReceiver(it) }
+        } catch (e: Exception) {
+            // ignore
+        }
+        try {
+            mediaController?.unregisterCallback(mediaCallback)
+        } catch (e: Exception) {
+            // ignore
+        }
     }
 
     private fun startProgressUpdate() {
@@ -408,18 +500,17 @@ class MusicPlayerActivity : AppCompatActivity() {
 
     private val progressUpdateRunnable = object : Runnable {
         override fun run() {
-            mediaController?.playbackState?.let { state ->
-                val position = state.position
-                seekBarProgress.progress = position.toInt()
-                tvCurrentTime.text = formatTime(position)
-                updateLyricsHighlight(position)
+            try {
+                mediaController?.playbackState?.let { state ->
+                    val position = state.position
+                    seekBarProgress.progress = position.toInt()
+                    tvCurrentTime.text = formatTime(position)
+                    updateLyricsHighlight(position)
+                }
+            } catch (e: Exception) {
+                // ignore
             }
             handler.postDelayed(this, UPDATE_INTERVAL)
         }
     }
-
-    /**
-     * 通知监听服务（用于获取媒体会话）
-     */
-    class NotificationListener : android.service.notification.NotificationListenerService()
 }
