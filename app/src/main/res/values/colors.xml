@@ -43,4 +43,8 @@
     
     <!-- 分隔线 -->
     <color name="divider">#333333</color>
+    
+    <!-- 新增颜色 -->
+    <color name="accent_color">#00CED1</color>
+    <color name="white">#FFFFFF</color>
 </resources>
