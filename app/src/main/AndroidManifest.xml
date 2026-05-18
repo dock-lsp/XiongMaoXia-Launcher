@@ -185,7 +185,7 @@
 
         <!-- 悬浮窗前台保活服务 -->
         <service
-            android:name="com.pandora.floating.FloatingForegroundService"
+            android:name="com.xmxcar.floating.FloatingForegroundService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
