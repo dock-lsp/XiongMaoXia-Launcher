@@ -37,6 +37,9 @@ class SettingsActivity : AppCompatActivity() {
         // 悬浮地图开关
         setupFloatingMapSwitch()
 
+        // 导航快捷入口
+        setupNavigationShortcut()
+
         // 悬浮天气开关
         setupFloatingWeatherSwitch()
 
@@ -153,6 +156,58 @@ class SettingsActivity : AppCompatActivity() {
                 Toast.makeText(this, R.string.floating_music_stopped, Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    /**
+     * 设置导航快捷入口
+     */
+    private fun setupNavigationShortcut() {
+        findViewById<View>(R.id.item_navigation)?.setOnClickListener {
+            showNavigationDialog()
+        }
+        bindSettingItem(
+            R.id.item_navigation,
+            R.drawable.ic_navigation,
+            "导航",
+            "高德/百度/腾讯地图"
+        )
+    }
+
+    /**
+     * 显示导航选择对话框
+     */
+    private fun showNavigationDialog() {
+        // 检查悬浮窗权限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            AlertDialog.Builder(this)
+                .setTitle("需要悬浮窗权限")
+                .setMessage("导航功能需要「显示在其他应用上层」权限。\n\n是否前往授权？")
+                .setPositiveButton("前往授权") { _, _ ->
+                    FloatingMapService.requestOverlayPermission(this)
+                }
+                .setNegativeButton("取消", null)
+                .show()
+            return
+        }
+
+        // 显示地图选择对话框
+        val maps = arrayOf("高德地图车机版", "高德地图手机版", "百度地图车机版", "百度地图手机版", "腾讯地图")
+        val mapTypes = arrayOf("amap", "amap", "baidu", "baidu", "tencent")
+        val isCarVersions = arrayOf(true, false, true, false, true)
+
+        AlertDialog.Builder(this)
+            .setTitle("选择导航应用")
+            .setItems(maps) { _, which ->
+                // 启动导航悬浮窗
+                FloatingMapService.start(
+                    context = this,
+                    mapType = mapTypes[which],
+                    isCarVersion = isCarVersions[which]
+                )
+                Toast.makeText(this, "正在启动导航...", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("取消", null)
+            .show()
     }
 
     /**
