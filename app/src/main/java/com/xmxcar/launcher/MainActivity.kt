@@ -242,7 +242,8 @@ class MainActivity : AppCompatActivity() {
             openFirstAvailableNavigation()
         }
         findViewById<LinearLayout>(R.id.nav_music)?.setOnClickListener {
-            openFirstAvailableMusic()
+            // 打开音乐播放器 Activity
+            startActivity(Intent(this, MusicPlayerActivity::class.java))
         }
         findViewById<LinearLayout>(R.id.nav_theme)?.setOnClickListener {
             showThemeCenterDialog()
@@ -307,7 +308,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupCardClicks() {
         findViewById<View>(R.id.card_map)?.setOnClickListener { openFirstAvailableNavigation() }
-        findViewById<View>(R.id.card_music)?.setOnClickListener { openFirstAvailableMusic() }
+        findViewById<View>(R.id.card_music)?.setOnClickListener { 
+            // 打开音乐播放器 Activity
+            startActivity(Intent(this, MusicPlayerActivity::class.java))
+        }
         
         // 地图卡片悬浮按钮 - 选择地图后启动画中画
         findViewById<View>(R.id.btn_float_map)?.setOnClickListener {

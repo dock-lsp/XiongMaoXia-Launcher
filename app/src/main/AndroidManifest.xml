@@ -97,6 +97,12 @@
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="sensor" />
 
+        <!-- 音乐播放器 -->
+        <activity
+            android:name=".MusicPlayerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.PandaCarLauncher" />
+
         <!-- 关于我们 -->
         <activity
             android:name=".AboutActivity"
