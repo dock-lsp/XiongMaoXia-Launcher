@@ -50,12 +50,6 @@ class FloatingMapService : Service() {
 
         /**
          * 启动导航悬浮窗
-         * @param context 上下文
-         * @param mapType 地图类型: "amap" | "baidu" | "tencent"
-         * @param isCarVersion 是否为车机版
-         * @param destLat 目标纬度（可选）
-         * @param destLng 目标经度（可选）
-         * @param destName 目标名称（可选）
          */
         fun start(
             context: Context,
@@ -116,7 +110,6 @@ class FloatingMapService : Service() {
     )
 
     private val mapConfigs = listOf(
-        // 高德地图
         MapConfig(
             type = "amap",
             name = "高德地图",
@@ -125,7 +118,6 @@ class FloatingMapService : Service() {
             carActivity = "com.autonavi.map.auto.NewMapActivity",
             phoneActivity = "com.autonavi.map.activity.NewMapActivity"
         ),
-        // 百度地图
         MapConfig(
             type = "baidu",
             name = "百度地图",
@@ -134,7 +126,6 @@ class FloatingMapService : Service() {
             carActivity = "com.baidu.naviauto.BaiduNaviAutoMapActivity",
             phoneActivity = "com.baidu.baidumaps.WelcomeActivity"
         ),
-        // 腾讯地图
         MapConfig(
             type = "tencent",
             name = "腾讯地图",
@@ -148,8 +139,6 @@ class FloatingMapService : Service() {
     private var windowManager: WindowManager? = null
     private var floatingContainer: View? = null
     private var params: WindowManager.LayoutParams? = null
-
-    // 悬浮窗参数
     private var currentWidthDp = DEFAULT_WIDTH_DP
     private var currentHeightDp = DEFAULT_HEIGHT_DP
 
@@ -168,28 +157,22 @@ class FloatingMapService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // 检查悬浮窗权限
         if (!canDrawOverlays(this)) {
-            // 权限未授予，创建提示视图
             createPermissionRequestView()
             return START_NOT_STICKY
         }
 
-        // 移除权限提示视图
         floatingContainer?.let {
             try { windowManager?.removeView(it) } catch (_: Exception) {}
             floatingContainer = null
         }
 
         if (floatingContainer == null) {
-            // 解析参数
             val mapType = intent?.getStringExtra(EXTRA_MAP_TYPE) ?: "amap"
             val isCarVersion = intent?.getBooleanExtra(EXTRA_IS_CAR_VERSION, true) ?: true
             val destLat = intent?.getDoubleExtra(EXTRA_DEST_LAT, 0.0)
             val destLng = intent?.getDoubleExtra(EXTRA_DEST_LNG, 0.0)
             val destName = intent?.getStringExtra(EXTRA_DEST_NAME)
-
-            // 创建悬浮窗
             createFloatingView(mapType, isCarVersion, destLat, destLng, destName)
         }
 
@@ -212,35 +195,33 @@ class FloatingMapService : Service() {
             elevation = 8f * density
         }
 
-        val contentLayout = LinearLayout(context).apply {
+        val contentLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            gravity = android.view.Gravity.CENTER
+            gravity = Gravity.CENTER
             setPadding(32, 32, 32, 32)
         }
 
-        val titleView = TextView(context).apply {
+        val titleView = TextView(this).apply {
             text = "需要悬浮窗权限"
             textSize = 18f
             setTextColor(0xFFFFFFFF.toInt())
-            gravity = android.view.Gravity.CENTER
+            gravity = Gravity.CENTER
         }
 
-        val descView = TextView(context).apply {
+        val descView = TextView(this).apply {
             text = "请授予「显示在其他应用上层」权限\n以便显示导航悬浮窗"
             textSize = 14f
             setTextColor(0xB3FFFFFF.toInt())
-            gravity = android.view.Gravity.CENTER
+            gravity = Gravity.CENTER
             setPadding(0, 16, 0, 24)
         }
 
-        val btnGrant = android.widget.Button(context).apply {
+        val btnGrant = android.widget.Button(this).apply {
             text = "前往授权"
-            setOnClickListener {
-                requestOverlayPermission(this@FloatingMapService)
-            }
+            setOnClickListener { requestOverlayPermission(this@FloatingMapService) }
         }
 
-        val btnClose = android.widget.Button(context).apply {
+        val btnClose = android.widget.Button(this).apply {
             text = "取消"
             setOnClickListener { stopSelf() }
             setPadding(0, 16, 0, 0)
@@ -290,11 +271,9 @@ class FloatingMapService : Service() {
         val widthPx = (currentWidthDp * density).toInt()
         val heightPx = (currentHeightDp * density).toInt()
 
-        // 找到对应的地图配置
         val config = mapConfigs.find { it.type == mapType } ?: mapConfigs[0]
         val packageName = if (isCarVersion) config.carPackage else config.phonePackage
 
-        // 检查地图是否已安装
         val isInstalled = try {
             packageManager.getPackageInfo(packageName, 0)
             true
@@ -312,7 +291,7 @@ class FloatingMapService : Service() {
         val titleBar = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setBackgroundColor(0x80000000)
+            setBackgroundColor(0x80000000.toInt())
             setPadding((12 * density).toInt(), 0, (12 * density).toInt(), 0)
             layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -320,7 +299,7 @@ class FloatingMapService : Service() {
             )
         }
 
-        val iconView = ImageView(context).apply {
+        val iconView = ImageView(this).apply {
             setImageResource(R.drawable.ic_navigation)
             setColorFilter(0xFF00CED1.toInt())
             layoutParams = LinearLayout.LayoutParams(
@@ -329,14 +308,14 @@ class FloatingMapService : Service() {
             ).apply { marginEnd = (8 * density).toInt() }
         }
 
-        val titleView = TextView(context).apply {
+        val titleView = TextView(this).apply {
             text = if (isInstalled) "${config.name}${if (isCarVersion) "车机版" else "手机版"}" else config.name
             textSize = 14f
             setTextColor(0xFFFFFFFF.toInt())
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
         }
 
-        val statusView = TextView(context).apply {
+        val statusTextView = TextView(this).apply {
             text = if (isInstalled) "点击启动" else "未安装"
             textSize = 11f
             setTextColor(0x80FFFFFF)
@@ -346,10 +325,9 @@ class FloatingMapService : Service() {
             ).apply { marginEnd = (8 * density).toInt() }
         }
 
-        val btnZoomOut = ImageView(context).apply {
+        val btnZoomOut = ImageView(this).apply {
             setImageResource(R.drawable.ic_minus)
             setColorFilter(0xFFFFFFFF.toInt())
-            setBackgroundResource(android.R.drawable.btn_default)
             isClickable = true
             isFocusable = true
             layoutParams = LinearLayout.LayoutParams(
@@ -358,10 +336,9 @@ class FloatingMapService : Service() {
             ).apply { marginEnd = (4 * density).toInt() }
         }
 
-        val btnZoomIn = ImageView(context).apply {
+        val btnZoomIn = ImageView(this).apply {
             setImageResource(R.drawable.ic_plus)
             setColorFilter(0xFFFFFFFF.toInt())
-            setBackgroundResource(android.R.drawable.btn_default)
             isClickable = true
             isFocusable = true
             layoutParams = LinearLayout.LayoutParams(
@@ -370,7 +347,7 @@ class FloatingMapService : Service() {
             ).apply { marginEnd = (4 * density).toInt() }
         }
 
-        val btnClose = ImageView(context).apply {
+        val btnClose = ImageView(this).apply {
             setImageResource(R.drawable.ic_close)
             setColorFilter(0xFFFFFFFF.toInt())
             isClickable = true
@@ -383,7 +360,7 @@ class FloatingMapService : Service() {
 
         titleBar.addView(iconView)
         titleBar.addView(titleView)
-        titleBar.addView(statusView)
+        titleBar.addView(statusTextView)
         titleBar.addView(btnZoomOut)
         titleBar.addView(btnZoomIn)
         titleBar.addView(btnClose)
@@ -410,10 +387,10 @@ class FloatingMapService : Service() {
             indeterminateTintList = android.content.res.ColorStateList.valueOf(0xFF00CED1.toInt())
         }
 
-        val loadingText = TextView(context).apply {
+        val loadingText = TextView(this).apply {
             text = if (isInstalled) "正在启动导航..." else "请先安装${config.name}"
             textSize = 13f
-            setTextColor(0x80FFFFFF.toInt())
+            setTextColor(0x80FFFFFF)
             gravity = Gravity.CENTER
             setPadding(0, (12 * density).toInt(), 0, 0)
         }
@@ -435,7 +412,6 @@ class FloatingMapService : Service() {
             if (!isDragging && isInstalled) {
                 launchNavigation(config, isCarVersion, destLat, destLng, destName)
             } else if (!isInstalled) {
-                // 打开应用市场
                 openAppMarket(packageName)
             }
         }
@@ -476,7 +452,6 @@ class FloatingMapService : Service() {
         try {
             windowManager?.addView(container, params)
             floatingContainer = container
-            // 延迟启动导航
             handler.postDelayed({
                 if (isInstalled) {
                     launchNavigation(config, isCarVersion, destLat, destLng, destName)
@@ -511,7 +486,6 @@ class FloatingMapService : Service() {
 
                 // 高德地图：传递导航目标
                 if (config.type == "amap") {
-                    // 高德支持通过 URI 传递导航参数
                     if (destLat != null && destLng != null) {
                         val uri = if (destName != null) {
                             "androidamap://route?sourceApplication=XMLauncher&slat=&slon=&sname=&dlat=$destLat&dlon=$destLng&dname=$destName&dev=0&m=0&t=1"
@@ -524,7 +498,6 @@ class FloatingMapService : Service() {
                 // 百度地图
                 else if (config.type == "baidu") {
                     if (destLat != null && destLng != null) {
-                        // 百度坐标需要转换（国测局坐标转百度坐标）
                         val bdLat = destLat + 0.0065
                         val bdLng = destLng + 0.0060
                         val uri = "baidumap://map/navi?location=$bdLat,$bdLng&coord_type=bd09ll"
@@ -533,13 +506,11 @@ class FloatingMapService : Service() {
                 }
             }
 
-            // 检查是否有可启动的 Activity
             val resolveInfo = packageManager.resolveActivity(intent, 0)
             if (resolveInfo != null) {
                 startActivity(intent)
                 updateStatus("正在导航中")
             } else {
-                // 尝试只指定包名
                 val simpleIntent = packageManager.getLaunchIntentForPackage(packageName)
                 if (simpleIntent != null) {
                     simpleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -564,7 +535,6 @@ class FloatingMapService : Service() {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
         } catch (e: Exception) {
-            // 应用市场也不可用
             try {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName"))
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -581,8 +551,8 @@ class FloatingMapService : Service() {
     private fun updateStatus(status: String) {
         handler.post {
             floatingContainer?.let { container ->
-                val statusView = container.findViewById<TextView>(R.id.map_status_text)
-                statusView?.text = status
+                val tv = container.findViewById<TextView>(R.id.map_status_text)
+                tv?.text = status
             }
         }
     }

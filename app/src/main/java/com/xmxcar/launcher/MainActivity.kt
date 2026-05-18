@@ -442,18 +442,8 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 2001) {
-            if (resultCode == RESULT_OK && data != null && pendingMapPackage != null) {
-                val intent = Intent(this, FloatingMapService::class.java).apply {
-                    putExtra(FloatingMapService.EXTRA_MAP_PACKAGE, pendingMapPackage)
-                    putExtra(FloatingMapService.EXTRA_MAP_NAME, pendingMapName)
-                    putExtra(FloatingMapService.EXTRA_CAPTURE_RESULT, resultCode)
-                    putExtra(FloatingMapService.EXTRA_CAPTURE_DATA, data)
-                }
-                startService(intent)
-                Toast.makeText(this, "${pendingMapName} 画中画已启动", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "需要截屏权限才能使用画中画", Toast.LENGTH_SHORT).show()
-            }
+            // 旧版画中画功能已移除，使用新的导航悬浮窗
+            Toast.makeText(this, "请从设置页面使用导航功能", Toast.LENGTH_SHORT).show()
             pendingMapPackage = null
             pendingMapName = null
         }
