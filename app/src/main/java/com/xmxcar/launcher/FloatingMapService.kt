@@ -318,7 +318,7 @@ class FloatingMapService : Service() {
         val statusTextView = TextView(this).apply {
             text = if (isInstalled) "点击启动" else "未安装"
             textSize = 11f
-            setTextColor(0x80FFFFFF)
+            setTextColor(0x80FFFFFF.toInt())
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -390,7 +390,7 @@ class FloatingMapService : Service() {
         val loadingText = TextView(this).apply {
             text = if (isInstalled) "正在启动导航..." else "请先安装${config.name}"
             textSize = 13f
-            setTextColor(0x80FFFFFF)
+            setTextColor(0x80FFFFFF.toInt())
             gravity = Gravity.CENTER
             setPadding(0, (12 * density).toInt(), 0, 0)
         }
